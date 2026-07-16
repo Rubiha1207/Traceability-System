@@ -17,27 +17,29 @@ class MFRC522:
 
     # Diese Funktion wird einmal aufgerufen wenn wir den Reader starten
     # Sie richtet alle Pins und die SPI Verbindung ein
-    def __init__(self, sck, mosi, miso, rst, cs):
-
+    #def __init__(self, sck, mosi, miso, rst, cs):
+    def __init__(self, spi, cs):
         # Wir sagen dem ESP32 welche Pins er benutzen soll
-        self.sck = Pin(sck, Pin.OUT)   # Takt Pin - gibt den Rhythmus vor
-        self.mosi = Pin(mosi, Pin.OUT) # Daten rausschicken (ESP32->Reader) Pin
-        self.miso = Pin(miso)          # Daten empfangen (Reader->ESP32) Pin
-        self.rst = Pin(rst, Pin.OUT)   # Reset Pin - startet Reader neu
-        self.cs = Pin(cs, Pin.OUT)     # Chip Select - aktiviert den Reader
+        #self.sck = Pin(sck, Pin.OUT)   # Takt Pin - gibt den Rhythmus vor
+        #self.mosi = Pin(mosi, Pin.OUT) # Daten rausschicken (ESP32->Reader) Pin
+        #self.miso = Pin(miso)          # Daten empfangen (Reader->ESP32) Pin
+        #self.rst = Pin(rst, Pin.OUT)   # Reset Pin - startet Reader neu
+        #self.cs = Pin(cs, Pin.OUT)     # Chip Select - aktiviert den Reader
 
         # Reader erstmal ausschalten und deaktivieren
-        self.rst.value(0)  # Reset auf 0 = Reader schläft
-        self.cs.value(1)   # CS auf 1 = Reader nicht ausgewählt (deaktiviert)
+        #self.rst.value(0)  # Reset auf 0 = Reader schläft
+        #self.cs.value(1)   # CS auf 1 = Reader nicht ausgewählt (deaktiviert)
 
         # SPI Verbindung einrichten - das ist die "Datenautobahn" zwischen
         # ESP32 und RFID Reader
-        self.spi = SPI(1, baudrate=1000000, polarity=0, phase=0,
-                       sck=self.sck, mosi=self.mosi, miso=self.miso)
-        self.spi.init() # Verbindung starten
-
+        #self.spi = SPI(1, baudrate=100000, polarity=0, phase=0,
+        #               sck=self.sck, mosi=self.mosi, miso=self.miso)
+        #self.spi.init() # Verbindung starten
+        self.spi = spi
+        self.cs = cs
+        self.cs.value(1)
         # Reader wieder aufwecken
-        self.rst.value(1)  # Reset auf 1 = Reader ist wach
+        #self.rst.value(1)  # Reset auf 1 = Reader ist wach
         self.init()        # Reader initialisieren
 
     # Diese Funktion schreibt einen Wert in ein Register des Readers
