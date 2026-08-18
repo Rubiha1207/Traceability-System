@@ -4,6 +4,7 @@ from mfrc522 import MFRC522
 from machine import SPI, Pin
 
 import time
+import sd_logger
 
 print("Traceability-System gestartet")
 
@@ -57,8 +58,9 @@ while True:
         if stat == rdr.OK:                                  # Wenn eine Karte gefunden wurde
             (stat, uid) = rdr.anticoll()                      # UID der Karte auslesen   
             if stat == rdr.OK:   
-                print(2)                           # Wenn die UID erfolgreich ausgelesen wurde
-                print(f"{name} - Bauteil erkannt! UID: {uid} (Scan-Dauer: {dt}ms)")
+                #print(2)                           # Wenn die UID erfolgreich ausgelesen wurde
+                print(f"{name} - Bauteil erkannt! Seriennummer: {uid} (Scan-Dauer: {dt}ms) (Status: i.O.)")
+                sd_logger.log_rfid_scan(tag_id=uid, status="i.O.", station=name)
     # 500 Millisekunden warten, bevor der nächste Scan durchgeführt wird
     # Dies verhindert, dass der Reader zu schnell scannt und möglicherweise mehrere Scans desselben Bauteils durchführt 
     time.sleep_ms(500)
