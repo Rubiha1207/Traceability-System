@@ -5,21 +5,22 @@ from machine import SPI, Pin
 
 import time
 import sd_logger
+#import cam_module
 
 print("Traceability-System gestartet")
 
-sck = Pin(18)
+sck = Pin(21) # vorher 18
 mosi = Pin(17)
 miso = Pin(16)
 
 spi = SPI( baudrate=2500000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
 
-cs1 = Pin(15, Pin.OUT, value=1)
-cs2 = Pin(38, Pin.OUT, value=1)
-cs3 = Pin(39, Pin.OUT, value=1)
-cs4 = Pin(40, Pin.OUT, value=1)
-rst = Pin(42, Pin.OUT)
-rst.value(1)  # Reset auf 1 = Reader ist wach
+cs1 = Pin(43, Pin.OUT, value=1)  #vorher 15
+cs2 = Pin(44, Pin.OUT, value=1)  #vorher 38
+cs3 = Pin(34, Pin.OUT, value=1)  #vorher 39
+cs4 = Pin(35, Pin.OUT, value=1)  #vorher 40
+#rst = Pin(21, Pin.OUT)
+#rst.value(1)  # Reset auf 1 = Reader ist wach
 
 rdr1 = MFRC522(spi, cs1)
 rdr2 = MFRC522(spi, cs2)
@@ -61,6 +62,7 @@ while True:
                 #print(2)                           # Wenn die UID erfolgreich ausgelesen wurde
                 print(f"{name} - Bauteil erkannt! Seriennummer: {uid} (Scan-Dauer: {dt}ms) (Status: i.O.)")
                 sd_logger.log_rfid_scan(tag_id=uid, status="i.O.", station=name)
+#                cam_module.take_picture(station=name)
     # 500 Millisekunden warten, bevor der nächste Scan durchgeführt wird
     # Dies verhindert, dass der Reader zu schnell scannt und möglicherweise mehrere Scans desselben Bauteils durchführt 
     time.sleep_ms(500)
