@@ -1,0 +1,13 @@
+test.jpg
+test_camera.jpg
+test_gray.png
+test_gray.raw
+test_gray_neu.png
+test_gray_neu.raw
+test_gray_new.raw
+esp32_backup/
+.vscode/
+.venv/
+__pycache__/
+freie_GPIO.py
+eim_config.toml

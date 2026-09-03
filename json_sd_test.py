@@ -20,12 +20,12 @@ try:
 except Exception as e:
     print("Fehler beim Mounten der SD-Karte:", e)
 
-# 2. Beispieldaten strukturieren (wie später beim RFID-Scan)
+# 2. Beispieldaten struktuID-Scan)
 log_entry = {
     "timestamp": time.time(),  # Sekundenzähler / Zeitstempel
     "tag_id": "13524678",  # Gemessene RFID UID
     "status": "OK",  # Status / Prüfergebnis
-    "station": "Station_01",  # Fertigungsstation
+    "station": "Station_01",  # Fertigungsstson_file_path = "/sd/log_data.json"
 }
 
 # Dateipfad festlegen
