@@ -28,4 +28,13 @@ print("Bildgroesse:", len(img), "Bytes")
 with open("test_gray.raw", "wb") as f:
     f.write(img)
 
-print("Graustufenbild gespeichert")
+# Helligkeit leicht reduzieren (-2 bis 2)
+if hasattr(cam, 'brightness'):
+    try:
+        cam.brightness(-1)
+    except TypeError:
+        cam.brightness = -1
+
+# Automatische Belichtung / Gain anpassen (falls vom Treiber unterstützt)
+if hasattr(cam, 'gain_control'):
+    cam.gain_control(False)
