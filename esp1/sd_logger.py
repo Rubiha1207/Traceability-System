@@ -64,3 +64,31 @@ def log_rfid_scan(tag_id, status="OK", station="Station_01"):
     except Exception as e:
         print("[SD FEHLER] Schreiben fehlgeschlagen:", e)
         return False
+
+def log_qr_scan(qr_data):
+    """Speichert einen QR-Code-Scan als JSON-Lines-Datensatz."""
+
+    if not _sd_mounted:
+        if not init_sd():
+            print("[SD FEHLER] Kann nicht schreiben, SD-Karte nicht bereit.")
+            return False
+
+    data = {
+        "timestamp": time.time(),
+        "qr_code": str(qr_data),
+        "source": "QR"
+    }
+
+    try:
+        with open(_log_file, "a") as f:
+            f.write(json.dumps(data) + "\n")
+
+        print(f"[SD LOG] QR gespeichert: {qr_data}")
+
+        return True
+
+    except Exception as e:
+
+        print("[SD FEHLER] Schreiben fehlgeschlagen:", e)
+
+        return False

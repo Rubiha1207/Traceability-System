@@ -13,7 +13,7 @@ miso = Pin(16)
 spi = SoftSPI( baudrate=2500000, polarity=0, phase=0, sck=sck, mosi=mosi, miso=miso)
 
 cs1 = Pin(15, Pin.OUT, value=1)  #vorher 15
-cs2 = Pin(0, Pin.OUT, value=1)  #vorher 38
+cs2 = Pin(38, Pin.OUT, value=1)  #vorher 38
 cs3 = Pin(18, Pin.OUT, value=1)  #vorher 39
 cs4 = Pin(47, Pin.OUT, value=1)  #vorher 40
 #rst = Pin(21, Pin.OUT)
