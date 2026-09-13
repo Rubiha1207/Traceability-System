@@ -5,9 +5,7 @@ from machine import SoftSPI, Pin, UART
 import time
 import sd_logger as sd_logger
 
-
 print("Traceability-System ESP1 gestartet")
-
 
 # ============================================================
 # RFID
@@ -26,10 +24,6 @@ spi = SoftSPI(
     miso=miso
 )
 
-# Vier RFID-Reader
-# GPIO43 und GPIO44 werden für UART verwendet und daher
-# NICHT mehr für RFID-CS verwendet.
-
 cs1 = Pin(15, Pin.OUT, value=1)
 cs2 = Pin(38, Pin.OUT, value=1)
 cs3 = Pin(18, Pin.OUT, value=1)
@@ -43,14 +37,12 @@ rdr4 = MFRC522(spi, cs4)
 for rdr in (rdr1, rdr2, rdr3, rdr4):
     rdr.init()
 
-
 reader = [
     ("Station 1: Wareneingang", rdr1),
     ("Station 2: Laserstation", rdr2),
     ("Station 3: Schweißstation", rdr3),
     ("Station 4: Qualitätskontrolle", rdr4)
 ]
-
 
 # ============================================================
 # UART
@@ -67,6 +59,15 @@ print("UART gestartet")
 print("RFID gestartet")
 print("Warte auf RFID- und QR-Daten...")
 
+# ============================================================
+# Hilfsfunktion
+# ============================================================
+
+def uid_to_id(uid):
+    return ",".join(str(x) for x in uid)
+
+# Merkt sich den zuletzt erkannten Tag pro Reader
+last_uid = [None, None, None, None]
 
 # ============================================================
 # Hauptschleife
@@ -93,18 +94,24 @@ try:
 
                 print("[UART] Empfangen:", message)
 
-                # QR-Nachricht
                 if "QR:" in message:
-                    qr_data = message.split("QR:", 1)[1]
-                    print("[QR] QR-Code von ESP2:", qr_data)
-                    sd_logger.log_qr_scan(qr_data=qr_data)
 
+                    qr_data = message.split("QR:", 1)[1]
+
+                    print(
+                        "[QR] QR-Code von ESP2:",
+                        qr_data
+                    )
+
+                    sd_logger.log_qr_scan(
+                        qr_data=qr_data
+                    )
 
         # ----------------------------------------------------
         # 2. RFID prüfen
         # ----------------------------------------------------
 
-        for name, rdr in reader:
+        for index, (name, rdr) in enumerate(reader):
 
             t0 = time.ticks_ms()
 
@@ -128,16 +135,49 @@ try:
                         f"(Status: i.O.)"
                     )
 
+                    # Nur einmal senden, solange derselbe
+                    # RFID-Tag auf dem Reader liegt
+                    if uid != last_uid[index]:
+
+                        last_uid[index] = uid
+
+                        component_id = uid_to_id(uid)
+
+                        station = index + 1
+                        quality = 1
+			status = 1
+
+			quality_text = "i.O." if quality == 1 else "n.i.O."
+
+			message = (
+    				"ID:" + str(component_id) +
+    				";STATION:" + str(station) +
+    				";QUALITY:" + quality_text +
+    				";STATUS:" + str(status) +
+    				"\n"
+			)
+
+                        uart.write(message)
+
+                        print(
+                            "[UART] Gesendet:",
+                            message.strip()
+                        )
+
+                    # RFID-Daten weiterhin auf SD speichern
                     sd_logger.log_rfid_scan(
                         tag_id=uid,
                         status="i.O.",
                         station=name
                     )
 
+            else:
 
-        # kurze Pause
+                # Kein Tag mehr vorhanden:
+                # Beim nächsten Auftauchen wieder senden
+                last_uid[index] = None
+
         time.sleep_ms(100)
-
 
 except KeyboardInterrupt:
 
